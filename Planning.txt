@@ -1,0 +1,17 @@
+1er mois 
+ADM1
+SciLab : 1 semaine.
+Formation GIT
+Formation python et reecriture python.
+
+2eme mois
+Introduction analyse de sensibilite
+Implementation
+
+3eme mois
+Introduction methode bayesian
+Callage des parametres methode bayesian.
+
+
+4eme mois
+Ecriture de rapport
