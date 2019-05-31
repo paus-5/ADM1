@@ -1,14 +1,15 @@
 from  scipy  import*
-from  scipy.integrate  import  odeint
-import  matplotlib . pyplot  as  plt
-def equadiff_resolution(x,t):
-    return -2*x(t)
-    t=linspace(0,1,12)
-    x0 = 0.1
-    dx=-2*x
-    solution= odeint ( equadiff_resolution, x0 , t)
-    x= solution[ : , 0 ]
-    pypl.plot(t,dx)
-    plt.show()
-    return 0
-    
+from  scipy.integrate import odeint
+import numpy as np
+import  matplotlib.pyplot  as  plt
+
+a=-2
+t= linspace(0,10 ,30)
+
+def equadiff_resolution (x,t) :
+    return a*x
+
+x0 = 0.2
+x= odeint (equadiff_resolution, [0.2] , t)
+plt . plot (t , x)
+plt . show ()
