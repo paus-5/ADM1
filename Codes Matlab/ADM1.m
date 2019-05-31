@@ -221,75 +221,77 @@ tf=200;
 pas=0.1;
 t=[t0:pas:tf];
 x=lsode("ODE_adm1",Xinit,t);
-n= size(x)
 
 %//////////////////////////////////////////////////////////////////////// 
 %////pH reconstruction from electoneutrality
 %////////////////////////////////////////////////////////////////////////
 %//
 for i=1:1:2001
-      Phi = x(i,25) + (x(i,11)-x(i,32)) - x(i,31) - x(i,30)/64 - x(i,29)/112 - x(i,28)/160 - x(i,27)/208 - x(i,26)
+      Phi = x(i,25) + (x(i,11)-x(i,32)) - x(i,31) - x(i,30)/64 - x(i,29)/112 - x(i,28)/160 - x(i,27)/208 - x(i,26);
       x(i,41) = - Phi/2 + sqrt(Phi.^2 + 4*K_w)/2;
       pH=-log10(x(i,41));
-      x(i,41)=pH; % calculate pH from S_H+
-
+      x(i,42)=pH; % calculate pH from S_H+
+      
+      
       %// Computations of transfer rates, gas flow rate for the figures. 
 
-      Stot=x(i,1)+x(i,2)+x(i,3)+x(i,4)+x(i,5)+x(i,6)+x(i,7)+x(i,8)+x(i,9)+x(i,10)+x(i,11)+x(i,12); %substrats sum
-      Xbact=x(i,17)+x(i,18)+x(i,19)+x(i,20)+x(i,21)+x(i,22)+x(i,23);  %Micro-organisms sum 
+      Stot(i)=x(i,1)+x(i,2)+x(i,3)+x(i,4)+x(i,5)+x(i,6)+x(i,7)+x(i,8)+x(i,9)+x(i,10)+x(i,11)+x(i,12); %substrats sum
+      Xbact(i)=x(i,17)+x(i,18)+x(i,19)+x(i,20)+x(i,21)+x(i,22)+x(i,23);  %Micro-organisms sum 
 
       %//// GAS PHASE
-      p_gas_h2 = x(i,33)*R*T_op/16; 
-      x(i,36)=p_gas_h2;
-      p_gas_ch4 = x(i,34)*R*T_op/64; 
-      x(i,37)=p_gas_ch4;
-      p_gas_co2 = x(i,35)*R*T_op; x(i,38)=p_gas_co2;
+      p_gas_h2(i) = x(i,33)*R*T_op/16; 
+      x(i,36)=p_gas_h2(i);
+      p_gas_ch4(i) = x(i,34)*R*T_op/64; 
+      x(i,37)=p_gas_ch4(i);
+      p_gas_co2(i) = x(i,35)*R*T_op; 
+      x(i,38)=p_gas_co2(i);
 
-      procT8 = kLa*(x(i,8)-16*K_H_h2*p_gas_h2);
-      procT9 = kLa*(x(i,9)-64*K_H_ch4*p_gas_ch4);
-      procT10 = kLa*((x(i,10)-x(i,31))-K_H_co2*p_gas_co2);
+      procT8(i) = kLa*(x(i,8)-16*K_H_h2*p_gas_h2(i));
+      procT9(i) = kLa*(x(i,9)-64*K_H_ch4*p_gas_ch4(i));
+      procT10(i) = kLa*((x(i,10)-x(i,31))-K_H_co2*p_gas_co2(i));
       % q_gas = R*T_op*V_liq*(procT8/16+procT9/64+procT10)/(P_atm-p_gas_h2o);
-      P_gas = p_gas_h2 + p_gas_ch4 + p_gas_co2 + p_gas_h2o; 
-      x(i,39)=P_gas;
+      P_gas(i) = p_gas_h2(i) + p_gas_ch4(i) + p_gas_co2(i) + p_gas_h2o; 
+      x(i,39)=P_gas(i);
         
       %// simplified gas calculation Batstone 2002
-      q_gas = k_P*(P_gas-P_atm).*P_gas/P_atm;
-      q_gas=max(q_gas,zeros(1,size((q_gas),2)));
-      x(i,40)= q_gas;
+      q_gas(i) = k_P*(P_gas(i)-P_atm).*P_gas(i)/P_atm;
+      q_gas(i)=max(q_gas(i),zeros(1,size((q_gas(i)),2)));
+      x(i,40)= q_gas(i)
 endfor
 
 %//data plot
 figure
 subplot(3,2,1)
-plot(t,Stot+x(:,13)+x(:,14)+x(:,15)+x(:,16)+x(:,24)+Xbact,'r');% À MODIFIER
+plot(t,Stot(:)+x(:,13)+x(:,14)+x(:,15)+x(:,16)+x(:,24)+Xbact(:),'r');
 ylabel('Total COD (kg.m^{-3})')
 
-%%%subplot(3,2,2)
-%%%plot(t,x(4,:)+x(5,:)+x(6,:)+x(7,:),'r')
-%%%ylabel('VFA (kg COD.m^{-3})')
-%%%
+subplot(3,2,2)
+plot(t,x(:,4)+x(:,5)+x(:,6)+x(:,7),'r')
+ylabel('VFA (kg COD.m^{-3})')
+
 subplot(3,2,4)
-plot(t,x(11,:),'b')
+plot(t,x(:,11),'b')
 ylabel('Inorganic nitrogen (kmole N.m^{-3})')
-%%%
-%%%subplot(3,2,5)
-%%%plot(t,q_gas,'r')
-%%%ylabel('Gas flow rate (Nm^3.d^{-1}) ')
-%%%xlabel('time (d)')
-%%%
-%%%subplot(3,2,6)
-%%%plot(t,x(37,:)./x(39,:)*100,'r')
-%%%ylabel('% CH_4')
-%%%xlabel('time (d)')
-%%%
-%%%subplot(3,2,3)
-%%%plot(t,Xbact,'r')
-%%%ylabel('Bacterial populations X_i (kg COD.m^{-3})')
-%%%
+
+subplot(3,2,5)
+plot(t,x(:,40),'r')
+ylabel('Gas flow rate (Nm^3.d^{-1}) ')
+xlabel('time (d)')
+
+subplot(3,2,6)
+plot(t,x(:,37)./x(:,39)*100,'r')
+ylabel('% CH_4')
+xlabel('time (d)')
+
+
+subplot(3,2,3)
+plot(t,Xbact(:),'r')
+ylabel('Bacterial populations X_i (kg COD.m^{-3})')
+
 figure
-plot(t,pH,'r')
+plot(t,x(:,42),'r')
 
 endfunction
 t=[0:0.1:200];
-x=simulationADM1(t)
+x=simulationADM1(t);
 

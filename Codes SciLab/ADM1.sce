@@ -29,7 +29,7 @@
 clear
 xdel(winsid())
 stacksize='max'
-cd('C:\Users\Pablo\Documents\adm1-sensitivity-analysis\Codes SciLab')
+//cd('C:\Users\Pablo\Documents\adm1-sensitivity-analysis\Codes SciLab')
 
 function x=simulationADM1(t)
 
