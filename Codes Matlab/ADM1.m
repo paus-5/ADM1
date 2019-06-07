@@ -28,11 +28,8 @@
 
 clf;
 clc;
-clear all; 
- 
-%xdel(winsid())
-%stacksize='max'
-cd /home/me;
+clear all;
+%cd /home/me;
 
 function x=simulationADM1(t)
 %//====================================================================
@@ -127,25 +124,25 @@ T_op = 308.15;
 
 %// physiochemical parameter, corrected in temperature
 R = 0.083145;
-K_w = (10^(-14))*exp((55900/(R*100))*(1/T_base-1/T_op));  % 2.08e-14;
+K_w = (10^(-14))*exp((55900/(R*100))*(1/T_base-1/T_op));  %// 2.08e-14;
 K_a_va = 10^-4.86;
 K_a_bu = 10^-4.82;
 K_a_pro = 10^-4.88;
 K_a_ac =  10^-4.76;
-K_a_co2 = 10^(-6.35)*exp((7646/(R*100))*(1/T_base-1/T_op));  % 4.94e-7 at 35°C;
-K_a_IN = 10^(-9.25)*exp((51965/(R*100))*(1/T_base-1/T_op));  % 1.11e-9 at 35°C;
-k_A_Bva = 1e10;     %1e8; according to STR 
-k_A_Bbu = 1e10;     %1e8; according to STR  
-k_A_Bpro = 1e10;    %1e8; according to STR 
-k_A_Bac = 1e10;     %1e8; according to STR 
-k_A_Bco2 = 1e10;    %1e8; according to STR 
-k_A_BIN = 1e10;     %1e8; according to STR n
+K_a_co2 = 10^(-6.35)*exp((7646/(R*100))*(1/T_base-1/T_op));  %// 4.94e-7 at 35°C;
+K_a_IN = 10^(-9.25)*exp((51965/(R*100))*(1/T_base-1/T_op));  %//1.11e-9 at 35°C;
+k_A_Bva = 1e10;     %//1e8; according to STR 
+k_A_Bbu = 1e10;     %//1e8; according to STR  
+k_A_Bpro = 1e10;    %//1e8; according to STR 
+k_A_Bac = 1e10;     %//1e8; according to STR 
+k_A_Bco2 = 1e10;    %//1e8; according to STR 
+k_A_BIN = 1e10;     %//1e8; according to STR n
 P_atm = 1.013;
-p_gas_h2o = 0.0313*exp(5290*(1/T_base-1/T_op));  %0.0557 at 35°C;
+p_gas_h2o = 0.0313*exp(5290*(1/T_base-1/T_op));  %//0.0557 at 35°C;
 kLa = 200;
-K_H_co2 = 0.035*exp((-19410/(R*100))*(1/T_base-1/T_op)); %0.0271 at 35°C;
-K_H_ch4 = 0.0014*exp((-14240/(R*100))*(1/T_base-1/T_op)); %0.00116 at 35°C;
-K_H_h2 = 7.8e-4*exp((-4180/(R*100))*(1/T_base-1/T_op)); %7.38e-4 at 35°C;
+K_H_co2 = 0.035*exp((-19410/(R*100))*(1/T_base-1/T_op)); %//0.0271 at 35°C;
+K_H_ch4 = 0.0014*exp((-14240/(R*100))*(1/T_base-1/T_op)); %//0.00116 at 35°C;
+K_H_h2 = 7.8e-4*exp((-4180/(R*100))*(1/T_base-1/T_op)); %//7.38e-4 at 35°C;
 
 %// Physical parameter
 V_liq =3400; %1400; //3400
@@ -158,8 +155,7 @@ k_P = 5e4;
 
 %//u=[0.1;0.1;0.1;0.1;0.1;0.1;0.1;0;0;0.0041256;0.17846;0.03;59.0229;0.1;0.1;0.1;0;0;0;0;0;0;0;34.2811;0.039126;0.178460;70;35] // validation input case 1
 %//u=[0;0.05;0;0;0;0;0;0;0;0.006;0.07;0.06;37;0;0;0;0;0;0;0;0;0;0;12;0.006;0.07;166;35] //validation input case 2
-u=[0;0;0;0;0;0;0;0;0;0.04;0.01;0;248;0;0;0;0;0;0;0;0;0;0;0;0.04;0.02;170;35];
-%//u=[0.01;0.001;0.001;0.001;0.001;0.001;0.001;1.00E-08;1.00E-05;0.04;0.01;0.02;2;5;20;5;0;0.01;0.01;0.01;0.01;0.01;0.01;25;0.04;0.02;170;35] //validation input Jeppsson 2006-2008
+u=[0;0;0;0;0;0;0;0;0;0.04;0.01;0;248;0;0;0;0;0;0;0;0;0;0;0;0.04;0.02;170;35];%//u=[0.01;0.001;0.001;0.001;0.001;0.001;0.001;1.00E-08;1.00E-05;0.04;0.01;0.02;2;5;20;5;0;0.01;0.01;0.01;0.01;0.01;0.01;25;0.04;0.02;170;35] //validation input Jeppsson 2006-2008
 q_in=u(27);
 
 %//////////////////////////////////////////////////////////////////////
@@ -211,26 +207,22 @@ S_H_ion = 5.3469e-008;
 
 Xinit=[S_su; S_aa; S_fa; S_va; S_bu; S_pro; S_ac; S_h2; S_ch4; S_IC; S_IN; S_I; X_xc; X_ch; X_pr; X_li; X_su; X_aa; X_fa; X_c4; X_pro; X_ac; X_h2; X_I; S_cat; S_an; S_hva; S_hbu; S_hpro; S_hac; S_hco3; S_nh3; S_gas_h2; S_gas_ch4; S_gas_co2; Q_D; T_D; S_D1_D; S_D2_D; S_D3_D; X_D4_D; X_D5_D];
 
-
 %%//////////////////////////////////////////////////////////////////////
 %%// Solver ODE
 %%//////////////////////////////////////////////////////////////////////
 exec("ODE_adm1.m");
-t0=0;
-tf=200;
-pas=0.1;
-t=[t0:pas:tf];
 x=lsode("ODE_adm1",Xinit,t);
 
 %//////////////////////////////////////////////////////////////////////// 
 %////pH reconstruction from electoneutrality
 %////////////////////////////////////////////////////////////////////////
 %//
+
 for i=1:1:2001
       Phi = x(i,25) + (x(i,11)-x(i,32)) - x(i,31) - x(i,30)/64 - x(i,29)/112 - x(i,28)/160 - x(i,27)/208 - x(i,26);
       x(i,41) = - Phi/2 + sqrt(Phi.^2 + 4*K_w)/2;
       pH=-log10(x(i,41));
-      x(i,42)=pH; % calculate pH from S_H+
+      x(i,42)=pH;% calculate pH from S_H+
       
       
       %// Computations of transfer rates, gas flow rate for the figures. 
@@ -239,11 +231,11 @@ for i=1:1:2001
       Xbact(i)=x(i,17)+x(i,18)+x(i,19)+x(i,20)+x(i,21)+x(i,22)+x(i,23);  %Micro-organisms sum 
 
       %//// GAS PHASE
-      p_gas_h2(i) = x(i,33)*R*T_op/16; 
+      p_gas_h2(i) = x(i,33)*R*T_op/16;
       x(i,36)=p_gas_h2(i);
       p_gas_ch4(i) = x(i,34)*R*T_op/64; 
       x(i,37)=p_gas_ch4(i);
-      p_gas_co2(i) = x(i,35)*R*T_op; 
+      p_gas_co2(i) = x(i,35)*R*T_op;
       x(i,38)=p_gas_co2(i);
 
       procT8(i) = kLa*(x(i,8)-16*K_H_h2*p_gas_h2(i));
@@ -255,43 +247,50 @@ for i=1:1:2001
         
       %// simplified gas calculation Batstone 2002
       q_gas(i) = k_P*(P_gas(i)-P_atm).*P_gas(i)/P_atm;
+
       q_gas(i)=max(q_gas(i),zeros(1,size((q_gas(i)),2)));
-      x(i,40)= q_gas(i)
+      
+      x(i,40)= q_gas(i);
 endfor
 
 %//data plot
 figure
 subplot(3,2,1)
-plot(t,Stot(:)+x(:,13)+x(:,14)+x(:,15)+x(:,16)+x(:,24)+Xbact(:),'r');
+plot(t,Stot(:)+x(:,13)+x(:,14)+x(:,15)+x(:,16)+x(:,24)+Xbact(:),'r',"linewidth",3);
 ylabel('Total COD (kg.m^{-3})')
 
 subplot(3,2,2)
-plot(t,x(:,4)+x(:,5)+x(:,6)+x(:,7),'r')
+plot(t,x(:,4)+x(:,5)+x(:,6)+x(:,7),'r',"linewidth",3)
 ylabel('VFA (kg COD.m^{-3})')
 
 subplot(3,2,4)
-plot(t,x(:,11),'b')
+plot(t,x(:,11),'b',"linewidth",3)
 ylabel('Inorganic nitrogen (kmole N.m^{-3})')
 
 subplot(3,2,5)
-plot(t,x(:,40),'r')
+plot(t,x(:,40),'r',"linewidth",3)
 ylabel('Gas flow rate (Nm^3.d^{-1}) ')
 xlabel('time (d)')
 
 subplot(3,2,6)
-plot(t,x(:,37)./x(:,39)*100,'r')
+plot(t,x(:,37)./x(:,39)*100,'r',"linewidth",3)
 ylabel('% CH_4')
 xlabel('time (d)')
 
 
 subplot(3,2,3)
-plot(t,Xbact(:),'r')
+plot(t,Xbact(:),'r',"linewidth", 3)
 ylabel('Bacterial populations X_i (kg COD.m^{-3})')
+print ("figure.pdf") 
 
 figure
-plot(t,x(:,42),'r')
-
+plot(t,x(:,42),'r',"linewidth",3)
+print ("PH.pdf") 
 endfunction
-t=[0:0.1:200];
+%%%% time %%%%%%%% :
+t0=0;
+tf=200;
+pas=0.1;
+t=[t0:pas:tf];
 x=simulationADM1(t);
 

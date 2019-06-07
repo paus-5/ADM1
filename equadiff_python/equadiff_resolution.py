@@ -9,7 +9,6 @@ t= linspace(0,10 ,30)
 def equadiff_resolution (x,t) :
     return a*x
 
-x0 = 0.2
 x= odeint (equadiff_resolution, [0.2] , t)
 plt . plot (t , x)
 plt . show ()

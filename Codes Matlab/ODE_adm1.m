@@ -132,7 +132,7 @@ p_gas_ch4 = x(34)*R*T_op/64;
 p_gas_co2 = x(35)*R*T_op;
   P_gas = p_gas_h2 + p_gas_ch4 + p_gas_co2 + p_gas_h2o;
 %  // simplified gas flow calculation, Batstone 2002
-  q_gas = k_P*(P_gas-P_atm)*P_gas/P_atm;
+  q_gas = k_P*(P_gas-P_atm);  %*P_gas/P_atm;
 
 
 %// pH algebric calculation
