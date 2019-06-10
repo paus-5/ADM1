@@ -50,7 +50,6 @@ X_D5_D = 106.0099
 S_H_ion = 5.3469e-008
 
 Xinit=np.array([S_su, S_aa, S_fa, S_va, S_bu, S_pro, S_ac, S_h2, S_ch4, S_IC, S_IN, S_I, X_xc, X_ch, X_pr, X_li, X_su, X_aa, X_fa, X_c4, X_pro, X_ac, X_h2, X_I, S_cat,S_an, S_hva, S_hbu, S_hpro, S_hac, S_hco3, S_nh3, S_gas_h2, S_gas_ch4, S_gas_co2, Q_D, T_D, S_D1_D, S_D2_D, S_D3_D, X_D4_D, X_D5_D])
-
 def ODE_adm1(x,t):
     
     #AJOUTS:
@@ -174,29 +173,31 @@ def ODE_adm1(x,t):
     #---simplified gas flow calculation, Batstone 2002
 
     q_gas = k_P*(P_gas-P_atm) #.*P_gas/P_atm;
+    
 
-
-    #---pH algebric calculation
-    phi = x[24]+(x[10]-x[31])-x[30]-x[29]/64-x[28]/112-x[27]/160-x[26]/208-x[25]
-    S_H_ion = -phi*0.5+0.5*np.sqrt(phi*phi+4*K_w)
+     #---pH algebric calculation
+    phi = x[24]+(x[10]-x[31])-x[30]-(x[29]/64)-(x[28]/112)-(x[27]/160)-(x[26]/208)-x[25]
+    S_H_ion = (-1)*phi*0.5+0.5*np.sqrt(phi*phi+4*K_w)
     if S_H_ion<=0 :
         S_H_ion=pow(10,-12)
      
-    pH_op = -np.log10(S_H_ion) # pH
+    pH_op = (-1)*np.log10(S_H_ion) # pH
     eps=0.000001
+
 
     #---Hill function on SH+ => ulf version 2008
 
-    pHLim_aa = pow(10,(-(pH_UL_aa + pH_LL_aa)/2))
-    pHLim_ac = pow(10,(-(pH_UL_ac + pH_LL_ac)/2))
-    pHLim_h2 = pow(10,(-(pH_UL_h2 + pH_LL_h2)/2))
+    pHLim_aa = pow(10,(-1*(pH_UL_aa + pH_LL_aa)/2))
+    pHLim_ac = pow(10,(-1*(pH_UL_ac + pH_LL_ac)/2))
+    pHLim_h2 = pow(10,(-1*(pH_UL_h2 + pH_LL_h2)/2))
     n_aa=3/(pH_UL_aa-pH_LL_aa)
     n_ac=3/(pH_UL_ac-pH_LL_ac)
     n_h2=3/(pH_UL_h2-pH_LL_h2)
     I_pH_aa = pow(pHLim_aa,n_aa)/(pow(S_H_ion,n_aa)+pow(pHLim_aa,n_aa))
     I_pH_ac = pow(pHLim_ac,n_ac)/(pow(S_H_ion,n_ac)+pow(pHLim_ac,n_ac))
     I_pH_h2 = pow(pHLim_h2,n_h2)/(pow(S_H_ion,n_h2)+pow(pHLim_h2,n_h2))
-
+    
+   
     #---Inhibition
     
     I_IN_lim = 1/(1+K_S_IN/x[10])
@@ -223,8 +224,8 @@ def ODE_adm1(x,t):
     proc5 = (k_m_su*x[0]/(K_S_su+x[0]))*x[16]*inhib[0]
     proc6 = (k_m_aa*x[1]/(K_S_aa+x[1]))*x[17]*inhib[0]
     proc7 = (k_m_fa*x[2]/(K_S_fa+x[2]))*x[18]*inhib[1]
-    proc8 = (k_m_c4*x[3]/(K_S_c4+x[3]))*x[19]*(x[3]/(x[3]+x[4]+eps))*inhib[3]
-    proc9 = (k_m_c4*x[4]/(K_S_c4+x[4]))*x[19]*(x[4]/(x[3]+x[4]+eps))*inhib[3]
+    proc8 = (k_m_c4*x[3]/(K_S_c4+x[3]))*x[19]*(x[3]/(x[3]+x[4]+eps))*inhib[2]
+    proc9 = (k_m_c4*x[4]/(K_S_c4+x[4]))*x[19]*(x[4]/(x[3]+x[4]+eps))*inhib[2]
     proc10 = (k_m_pro*x[5]/(K_S_pro+x[5]))*x[20]*inhib[3]
     proc11 = (k_m_ac*x[6]/(K_S_ac+x[6]))*x[21]*inhib[4]
     proc12 = (k_m_h2*x[7]/(K_S_h2+x[7]))*x[22]*inhib[5]
@@ -235,20 +236,23 @@ def ODE_adm1(x,t):
     proc17 = k_dec_Xpro*x[20]
     proc18 = k_dec_Xac*x[21]
     proc19 = k_dec_Xh2*x[22]
+    
 
     #--- Acid-base rates
+    
     procA4 = k_A_Bva*(x[26]*(K_a_va+S_H_ion)-K_a_va*x[3])
     procA5 = k_A_Bbu*(x[27]*(K_a_bu+S_H_ion)-K_a_bu*x[4])
     procA6 = k_A_Bpro*(x[28]*(K_a_pro+S_H_ion)-K_a_pro*x[5])
     procA7 = k_A_Bac*(x[29]*(K_a_ac+S_H_ion)-K_a_ac*x[6]);
     procA10 = k_A_Bco2*(x[30]*(K_a_co2+S_H_ion)-K_a_co2*x[9])
     procA11 = k_A_BIN*(x[31]*(K_a_IN+S_H_ion)-K_a_IN*x[10])
-
+    
     #--- Gas transfer rates
              
     procT8 = kLa*(x[7]-16*K_H_h2*p_gas_h2)
     procT9 = kLa*(x[8]-64*K_H_ch4*p_gas_ch4)
     procT10 = kLa*((x[9]-x[30])-K_H_co2*p_gas_co2)
+    
 
     #--- reaction parameters
 
@@ -266,7 +270,7 @@ def ODE_adm1(x,t):
     stoich12 = (1-Y_h2)*C_ch4 + Y_h2*C_bac
     stoich13 = -C_bac + C_xc
 
-    reac1 = proc2+(1-f_fa_li)*proc4-proc5
+    reac1 = proc2+((1-f_fa_li)*proc4)-proc5
     reac2 = proc3-proc6
     reac3 = f_fa_li*proc4-proc7
     reac4 = (1-Y_aa)*f_va_aa*proc6-proc8
@@ -298,8 +302,8 @@ def ODE_adm1(x,t):
         q_gas = 0.0
 
     #---differential equation ///////////////////////////////////////////////
-    dx=np.array([0 for i in range(42)])    
-    dx[0] = 1/V_liq*(u[26]*(u[0]-x[0]))+reac1  # Ssu
+    dx=np.array([0 for i in range(42)])
+    dx[0] = ((1/V_liq)*(u[26]*(u[0]-x[0])))+reac1  # Ssu
     dx[1] = 1/V_liq*(u[26]*(u[1]-x[1]))+reac2  # Saa
     dx[2] = 1/V_liq*(u[26]*(u[2]-x[2]))+reac3  # Sfa
     dx[3] = 1/V_liq*(u[26]*(u[3]-x[3]))+reac4  # Sva 
@@ -319,7 +323,7 @@ def ODE_adm1(x,t):
     dx[17] = 1/V_liq*(u[26]*(u[17]-x[17]))+reac18 # Xaa
     dx[18] = 1/V_liq*(u[26]*(u[18]-x[18]))+reac19 # Xfa
     dx[19] = 1/V_liq*(u[26]*(u[19]-x[19]))+reac20 # Xc4
-    dx[20] = 1/V_liq*(u[26]*(u[20]-x[20]))+reac21 # Xpro
+    dx[20] = 1/V_liq*(u[26]*(u[20]-x[20]))+reac21 # Xpr
     dx[21] = 1/V_liq*(u[26]*(u[21]-x[21]))+reac22 # Xac
     dx[22] = 1/V_liq*(u[26]*(u[22]-x[22]))+reac23 # Xh2
     dx[23] = 1/V_liq*(u[26]*(u[23]-x[23]))+reac24 # XI
@@ -348,15 +352,29 @@ def ODE_adm1(x,t):
     dx[39] = 0
     dx[40] = 0
     dx[41] = 0
-    
-    return(dx)
-
    
+    
+    return np.array([dx[i] for i in range(42)])
+
+    
+R = 0.083145
+T_op = 308.15
+T_base = 298.15
+K_w = (pow(10,(-14)))*np.exp((55900/(R*100))*(1/T_base-1/T_op))  # 2.08e-14
+dx= ODE_adm1(Xinit,t)
+print(dx)
 x= odeint (ODE_adm1, Xinit , t)
+pH=np.array([0 for i in range(2001)])
+for i in range(0,2001):
+    Phi = x[i][24] + (x[i][10]-x[i][31]) - x[i][30] - x[i][29]/64 - x[i][28]/112 - x[i][27]/160 - x[i][26]/208 - x[i][25]
+    x[i][40] = - Phi/2 + sqrt(pow(Phi, 2) + 4*K_w)/2
+    pH[i]=-log10(x[i][40])
+plt.plot(t,pH)
+plt.show()
 np.savetxt('test.txt', x)
 print("la solution de l'edo est:", x) # juste pour voir si c'est correct 
-plt . plot (t , x) # juste pour voir si c'est correct 
-plt . show ()
+#plt . plot (t , x) # juste pour voir si c'est correct 
+#plt . show ()
 
 
 
