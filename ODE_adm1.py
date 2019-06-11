@@ -208,9 +208,9 @@ def ODE_adm1(x,t):
     I_h2_pro = 1/(1+x[7]/K_Ih2_pro)
     I_nh3 = 1/(1+x[31]/K_I_nh3)
     
-    inhib=np.array([0 for i in range(6)])
-    inhib[0] = (I_pH_aa*I_IN_lim) # Produit de deux valeurs non nulles qui vaut 0 !!!!
-    print("inhib0==",inhib[0]) # inhib[0]=0 alors que sa valeur attendue est non nulle !!!!
+    inhib= zeros(6) # array([0 for i in range(6)])
+    inhib[0] =(I_pH_aa*I_IN_lim) # Produit de deux valeurs non nulles qui vaut 0 !!!! PB RÉGLÉ ( il fallait initialiser le tableau inhib en utilisant zeros(6))
+    print("inhib0==",inhib[0]) # inhib[0]=0 alors que la valeur attendue est non nulle !!!!
     inhib[1] = inhib[0]*I_h2_fa
     inhib[2] = inhib[0]*I_h2_c4
     inhib[3] = inhib[0]*I_h2_pro
