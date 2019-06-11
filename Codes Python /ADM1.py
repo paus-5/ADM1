@@ -12,7 +12,7 @@ def ADM1(t):
     f_xI_xc = 0.53#0.2;
     f_ch_xc = 0.41#0.2;
     f_pr_xc = 0.06#0.2;
-    f_li_xc = 0#0.3;  
+    f_li_xc = 0#0.3; 
 
     N_xc = 0.0376/14
     N_I = 0.06/14
@@ -50,7 +50,7 @@ def ADM1(t):
     C_ch4 = 0.0156
     Y_ac = 0.05
     Y_h2 = 0.06
-
+    
     #// Biochemical parameter:
     k_dis = 0.5
     k_hyd_ch = 10
@@ -88,12 +88,12 @@ def ADM1(t):
     k_dec_Xpro = 0.02
     k_dec_Xac = 0.02
     k_dec_Xh2 = 0.02
-
+    
     #//temperature
     T_base = 298.15
     T_op = 308.15
 
-        #// physiochemical parameter, corrected in temperature
+    #// physiochemical parameter, corrected in temperature
     R = 0.083145
     K_w = (pow(10,(-14)))*np.exp((55900/(R*100))*(1/T_base-1/T_op))  #// 2.08e-14
     K_a_va = pow(10,-4.86)
@@ -184,24 +184,24 @@ def ADM1(t):
     print(x)
 
 
-
+    
     #//////////////////////////////////////////////////////////////////////// 
     #//////////////pH reconstruction from electoneutrality
     #////////////////////////////////////////////////////////////////////////
 
-    stot[2001]=np.array([0 for i in range (0,201,0.1)])
-    Xbact[2001]=np.array([0 for i in range (0,201,0.1)])
-    p_gas_h2[2001]=np.array([0 for i in range (0,201,0.1)])
-    p_gas_ch4[2001]=np.array([0 for i in range (0,201,0.1)])
-    p_gas_co2[2001]=np.array([0 for i in range (0,201,0.1)])
-    P_gas[2001]=np.array([0 for i in range (0,201,0.1)])
+    stot=zeros(2001)
+    Xbact=zeros(2001)
+    p_gas_h2=zeros(2001)
+    p_gas_ch4=zeros(2001)
+    p_gas_co2=zeros(2001)
+    P_gas=zeros(2001)
 
-
-    for i in range (0,201,0.1):
+    for i in range (0,2001):
 
         Phi = x[i][24] + (x[i][10]-x[i][31]) - x[i][30] - x[i][29]/64 - x[i][28]/112 - x[i][27]/160 - x[i][26]/208 - x[i][25]
         x[i][40] = - Phi/2 + sqrt(pow(Phi, 2) + 4*K_w)/2
         pH=-log10(x[i][40])
+        print("pH ==== ",pH)
         x[i][41]=pH #% calculate pH from S_H+
           
           
@@ -236,11 +236,8 @@ def ADM1(t):
 
     return 0
 
-    t0=0
-    tf=200
-    pas=0.1
-    t=[t0,pas,tf]
-    x= ADM1(t)
+t=np.linspace(0,200,2001)
+x= ADM1(t)
 
 
 
