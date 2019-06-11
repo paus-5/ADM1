@@ -194,6 +194,7 @@ def ODE_adm1(x,t):
     n_ac=3/(pH_UL_ac-pH_LL_ac)
     n_h2=3/(pH_UL_h2-pH_LL_h2)
     I_pH_aa = pow(pHLim_aa,n_aa)/(pow(S_H_ion,n_aa)+pow(pHLim_aa,n_aa))
+    print("I_pH_aa== ", I_pH_aa) # I_pH_aa==  0.9999922826471167 ?? 
     I_pH_ac = pow(pHLim_ac,n_ac)/(pow(S_H_ion,n_ac)+pow(pHLim_ac,n_ac))
     I_pH_h2 = pow(pHLim_h2,n_h2)/(pow(S_H_ion,n_h2)+pow(pHLim_h2,n_h2))
     
@@ -201,14 +202,15 @@ def ODE_adm1(x,t):
     #---Inhibition
     
     I_IN_lim = 1/(1+K_S_IN/x[10])
+    print("I_IN_lim==", I_IN_lim) # I_IN_lim== 0.9990368872194935 c bon 
     I_h2_fa = 1/(1+x[7]/K_Ih2_fa)
     I_h2_c4 = 1/(1+x[7]/K_Ih2_c4)
     I_h2_pro = 1/(1+x[7]/K_Ih2_pro)
     I_nh3 = 1/(1+x[31]/K_I_nh3)
     
     inhib=np.array([0 for i in range(6)])
-
-    inhib[0] = I_pH_aa*I_IN_lim
+    inhib[0] = (I_pH_aa*I_IN_lim) # Produit de deux valeurs non nulles qui vaut 0 !!!!
+    print("inhib0==",inhib[0]) # inhib[0]=0 alors que sa valeur attendue est non nulle !!!!
     inhib[1] = inhib[0]*I_h2_fa
     inhib[2] = inhib[0]*I_h2_c4
     inhib[3] = inhib[0]*I_h2_pro
@@ -221,7 +223,7 @@ def ODE_adm1(x,t):
     proc2 = k_hyd_ch*x[13]
     proc3 = k_hyd_pr*x[14]
     proc4 = k_hyd_li*x[15]
-    proc5 = (k_m_su*x[0]/(K_S_su+x[0]))*x[16]*inhib[0]
+    proc5 = (k_m_su*x[0]/(K_S_su+x[0]))*x[16]*inhib[0] # PB : inhib[0]
     proc6 = (k_m_aa*x[1]/(K_S_aa+x[1]))*x[17]*inhib[0]
     proc7 = (k_m_fa*x[2]/(K_S_fa+x[2]))*x[18]*inhib[1]
     proc8 = (k_m_c4*x[3]/(K_S_c4+x[3]))*x[19]*(x[3]/(x[3]+x[4]+eps))*inhib[2]
@@ -271,6 +273,11 @@ def ODE_adm1(x,t):
     stoich13 = -C_bac + C_xc
 
     reac1 = proc2+((1-f_fa_li)*proc4)-proc5
+    print("proc2==",proc2) #test 
+    print("1-f_fa_li",1-f_fa_li) #test (PAS PB)
+    print("proc4==",proc4) #test(PAS PB)
+    print("proc5==",proc5) #test (PB)
+
     reac2 = proc3-proc6
     reac3 = f_fa_li*proc4-proc7
     reac4 = (1-Y_aa)*f_va_aa*proc6-proc8
@@ -304,6 +311,12 @@ def ODE_adm1(x,t):
     #---differential equation ///////////////////////////////////////////////
     dx=np.array([0 for i in range(42)])
     dx[0] = ((1/V_liq)*(u[26]*(u[0]-x[0])))+reac1  # Ssu
+
+    print("reac1==",reac1) # // PB À TROUVER 
+    #print("1/V_LIQ==", 1/V_liq) // pas de pb 
+    #print("x0==",x[0]) // pas de pb 
+    print("dx[0]==",dx[0]) # PB PAS LA BONNE VALEUR
+    
     dx[1] = 1/V_liq*(u[26]*(u[1]-x[1]))+reac2  # Saa
     dx[2] = 1/V_liq*(u[26]*(u[2]-x[2]))+reac3  # Sfa
     dx[3] = 1/V_liq*(u[26]*(u[3]-x[3]))+reac4  # Sva 
@@ -354,7 +367,7 @@ def ODE_adm1(x,t):
     dx[41] = 0
    
     
-    return np.array([dx[i] for i in range(42)])
+    return (dx)
 
     
 R = 0.083145
