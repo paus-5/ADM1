@@ -360,20 +360,97 @@ R = 0.083145
 T_op = 308.15
 T_base = 298.15
 K_w = (pow(10,(-14)))*np.exp((55900/(R*100))*(1/T_base-1/T_op))  # 2.08e-14
+p_gas_h2o = 0.0313*np.exp(5290*(1/T_base-1/T_op))  #//0.0557 at 35°C
+k_P = 5e4
+P_atm = 1.013
 dx= ODE_adm1(Xinit,t)
-print(dx)
 x= odeint (ODE_adm1, Xinit , t)
 pH=zeros(2001)
-for i in range(0,2001):
-    Phi = x[i][24] + (x[i][10]-x[i][31]) - x[i][30] - x[i][29]/64 - x[i][28]/112 - x[i][27]/160 - x[i][26]/208 - x[i][25]
-    x[i][40] = - Phi/2 + sqrt(pow(Phi, 2) + 4*K_w)/2
-    pH[i]=-log10(x[i][40])
+Stot=zeros(2001)
+Xbact=zeros(2001)
+p_gas_h2=zeros(2001)
+p_gas_ch4=zeros(2001)
+p_gas_co2=zeros(2001)
+P_gas=zeros(2001)
+q_gas=zeros(2001)
+T_COD=zeros(2001)
+VFA=zeros(2001)
+IN_N=zeros(2001)
+ch4_per=zeros(2001)
+for i in range (0,2001):
+
+        Phi = x[i][24] + (x[i][10]-x[i][31]) - x[i][30] - x[i][29]/64 - x[i][28]/112 - x[i][27]/160 - x[i][26]/208 - x[i][25]
+        x[i][40] = - Phi/2 + sqrt(pow(Phi, 2) + 4*K_w)/2
+        pH[i]=-log10(x[i][40])
+        x[i][41]=pH[i] #% calculate pH from S_H+
+          
+          
+        #------------ Computations of transfer rates, gas flow rate for the figures : 
+
+        Stot[i]=x[i][0]+x[i][1]+x[i][2]+x[i][3]+x[i][4]+x[i][5]+x[i][6]+x[i][7]+x[i][8]+x[i][9]+x[i][10]+x[i][11] #substrats sum
+        Xbact[i]=x[i][16]+x[i][17]+x[i][18]+x[i][19]+x[i][20]+x[i][21]+x[i][22]  #Micro-organisms sum
+        T_COD[i]=Stot[i]+x[i][12]+x[i][13]+x[i][14]+x[i][15]+x[i][23]+Xbact[i]
+        VFA[i]=x[i][3]+x[i][4]+x[i][5]+x[i][6]
+        IN_N[i]=x[i][10]
+        
+
+        #----------GAS PHASE :
+        
+        p_gas_h2[i]= x[i][32]*R*T_op/16
+        x[i][35]=p_gas_h2[i]
+        p_gas_ch4[i] = x[i][33]*R*T_op/64 
+        x[i][36]=p_gas_ch4[i]
+        p_gas_co2[i] = x[i][34]*R*T_op
+        x[i][37]=p_gas_co2[i]
+
+        
+        P_gas[i] = p_gas_h2[i] + p_gas_ch4[i] + p_gas_co2[i] + p_gas_h2o 
+        x[i][38]=P_gas[i]
+
+        ##---% CH4:
+        ch4_per[i]=(x[i][36]/x[i][38])*100
+
+        ##---// simplified gas calculation Batstone 2002 :
+
+        q_gas[i] = k_P*(P_gas[i]-P_atm)*P_gas[i]/P_atm
+        #q_gas=max(q_gas,zeros(size(q_gas)))  
+        x[i][39]= q_gas[i]
+
 plt.plot(t,pH)
-plt.show()
-np.savetxt('test.txt', x)
-print("la solution de l'edo est:", x) # juste pour voir si c'est correct 
-#plt . plot (t , x) # juste pour voir si c'est correct 
-#plt . show ()
+plt.ylabel("PH") # graphe bon
+plt.savefig('PH.pdf')  
+
+
+plt.figure
+plt.gcf().subplots_adjust(left = 0.2, bottom = 0.2, right = 0.9, top = 0.9, wspace = 0.9, hspace = 0.7)
+plt.subplot(3,2,1)
+plt.plot(t,T_COD,color='red');
+plt.ylabel("T_COD")
+
+plt.subplot(3,2,2)
+plt.plot(t,VFA,color='green')
+plt.ylabel('VFA')
+
+plt.subplot(3,2,4)
+plt.plot(t,IN_N,color='yellow')
+plt.ylabel("In_nitro")
+
+plt.subplot(3,2,5)
+plt.plot(t,q_gas,color='black')
+plt.ylabel('Gasflow')
+plt.xlabel('time (d)')
+
+plt.subplot(3,2,6)
+plt.plot(t,ch4_per,color='brown')
+plt.ylabel('% CH_4')
+plt.xlabel('time (d)')
+
+plt.subplot(3,2,3)
+plt.plot(t,Xbact,color='blue')
+plt.ylabel('Bact_pop')
+plt.savefig('FIGURE.pdf')
+
+#np.savetxt('test.txt', x)
 
 
 
