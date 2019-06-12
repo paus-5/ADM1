@@ -4,7 +4,21 @@ import numpy as np
 import  matplotlib.pyplot  as  plt
 
 
-t= linspace(0,200 ,2001)
+#--- Temperature :---------------------------------------------------------
+
+T_op = 308.15
+T_base = 298.15
+
+#--- Some Physical, physiochemical parameter : ----------------------------
+
+k_P = 5e4
+R = 0.083145
+K_w = (pow(10,(-14)))*np.exp((55900/(R*100))*(1/T_base-1/T_op))  # 2.08e-14
+p_gas_h2o = 0.0313*np.exp(5290*(1/T_base-1/T_op))  #//0.0557 at 35°C
+P_atm = 1.013
+
+#--- Initial conditions: --------------------------------------------------
+
 S_su =  0.024309
 S_aa =  0.010808
 S_fa =  0.29533
@@ -47,49 +61,102 @@ S_D2_D = 1
 S_D3_D = 1
 X_D4_D = 106.0099
 X_D5_D = 106.0099
-S_H_ion = 5.3469e-008
-
 Xinit=np.array([S_su, S_aa, S_fa, S_va, S_bu, S_pro, S_ac, S_h2, S_ch4, S_IC, S_IN, S_I, X_xc, X_ch, X_pr, X_li, X_su, X_aa, X_fa, X_c4, X_pro, X_ac, X_h2, X_I, S_cat,S_an, S_hva, S_hbu, S_hpro, S_hac, S_hco3, S_nh3, S_gas_h2, S_gas_ch4, S_gas_co2, Q_D, T_D, S_D1_D, S_D2_D, S_D3_D, X_D4_D, X_D5_D])
+
+#---Initialisation des tableaux :
+
+pH=zeros(2001)
+Stot=zeros(2001)
+Xbact=zeros(2001)
+p_gas_h2=zeros(2001)
+p_gas_ch4=zeros(2001)
+p_gas_co2=zeros(2001)
+P_gas=zeros(2001)
+q_gas=zeros(2001)
+T_COD=zeros(2001)
+VFA=zeros(2001)
+IN_N=zeros(2001)
+ch4_per=zeros(2001)
+
+#-------------------------------
+
 def ODE_adm1(x,t):
     
-    #AJOUTS:
+    #--- Stoechimetric parameter :------------
+
+    f_sI_xc = 0 #0.1       
+    f_xI_xc = 0.53 #0.2    
+    f_ch_xc = 0.41 #0.2     
+    f_pr_xc = 0.06 #0.2
+    f_li_xc = 0    #0.3 
+    N_xc = 0.0376/14
+    N_I = 0.06/14    
+    N_aa = 0.007  
+    C_xc = 0.02786    
+    C_sI = 0.03      
+    C_ch = 0.0313    
+    C_pr = 0.03      
+    C_li = 0.022   
+    C_xI = 0.03    
+    C_su = 0.0313  
+    C_aa = 0.03    
+    f_fa_li = 0.95  
+    C_fa = 0.0217   
+    f_h2_su = 0.19  
+    f_bu_su = 0.13  
+    f_pro_su = 0.27 
+    f_ac_su = 0.41  
+    N_bac = 0.08/14 
+    C_bu = 0.025   
+    C_pro = 0.0268 
+    C_ac = 0.0313  
+    C_bac = 0.0313 
+    Y_su = 0.1     
+    f_h2_aa = 0.06 
+    f_va_aa = 0.23 
+    f_bu_aa = 0.26  
+    f_pro_aa = 0.05 
+    f_ac_aa = 0.40  
+    C_va = 0.024    
+    Y_aa = 0.08     
+    Y_fa = 0.06     
+    Y_c4 = 0.06     
+    Y_pro = 0.04    
+    C_ch4 = 0.0156  
+    Y_ac = 0.05     
+    Y_h2 = 0.06     
     
-    R = 0.083145
-    T_op = 308.15
-    T_base = 298.15
-    p_gas_h2o = 0.0313*np.exp(5290*(1/T_base-1/T_op))  #0.0557 at 35°C
-    k_P = 5e4
-    P_atm = 1.013
-    K_w = (pow(10,(-14)))*np.exp((55900/(R*100))*(1/T_base-1/T_op))  # 2.08e-14
-    pH_UL_aa = 5.5
-    pH_LL_aa = 4
-    pH_UL_ac = 7
-    pH_LL_ac = 6
-    pH_UL_h2 = 6
-    pH_LL_h2 = 5
-    K_S_IN = 1e-4
-    K_Ih2_fa = 5e-6
-    K_Ih2_c4 = 1e-5
-    K_Ih2_pro = 3.5e-6
-    K_I_nh3 = 0.0018
-    k_dis = 0.5
-    k_hyd_ch = 10
-    k_hyd_pr = 10
-    k_hyd_li = 10
-    k_m_su = 30
-    K_S_su = 0.5
-    k_m_aa = 50
-    K_S_aa = 0.3
-    k_m_fa = 6
-    K_S_fa = 0.4
-    k_m_c4 = 20
-    K_S_c4 = 0.2
-    k_m_pro = 13
-    K_S_pro = 0.1
-    k_m_ac = 8
-    K_S_ac = 0.15
-    k_m_h2 = 35
-    K_S_h2 = 7e-6
+    #--- Biochemical parameter : ---------------------
+
+    k_dis = 0.5 
+    k_hyd_ch = 10 
+    k_hyd_pr = 10 
+    k_hyd_li = 10 
+    K_S_IN = 1e-4 
+    k_m_su = 30   
+    K_S_su = 0.5   
+    pH_UL_aa = 5.5 
+    pH_LL_aa = 4   
+    k_m_aa = 50    
+    K_S_aa = 0.3   
+    k_m_fa = 6     
+    K_S_fa = 0.4   
+    K_Ih2_fa = 5e-6 
+    k_m_c4 = 20     
+    K_S_c4 = 0.2    
+    K_Ih2_c4 = 1e-5 
+    k_m_pro = 13    
+    K_S_pro = 0.1   
+    K_Ih2_pro = 3.5e-6  
+    k_m_ac = 8      
+    K_S_ac = 0.15   
+    K_I_nh3 = 0.0018    
+    pH_UL_ac = 7      
+    pH_LL_ac = 6      
+    k_m_h2 = 35       
+    K_S_h2 = 7e-6     
+    pH_UL_h2 = 6     
+    pH_LL_h2 = 5    
     k_dec_Xsu = 0.02
     k_dec_Xaa = 0.02
     k_dec_Xfa = 0.02
@@ -97,85 +164,56 @@ def ODE_adm1(x,t):
     k_dec_Xpro = 0.02
     k_dec_Xac = 0.02
     k_dec_Xh2 = 0.02
-    K_a_va = pow(10,-4.86)
-    K_a_bu = pow(10,-4.82)
-    K_a_pro = pow(10,-4.88)
-    K_a_ac =pow(10,-4.76)
+
+    
+    #--- Physiochemical parameter : ------------------------------------------------------
+
+    K_a_va = pow(10,-4.86)  
+    K_a_bu = pow(10,-4.82)  
+    K_a_pro = pow(10,-4.88) 
+    K_a_ac =pow(10,-4.76)   
     K_a_co2 = pow(10,(-6.35))*np.exp((7646/(R*100))*(1/T_base-1/T_op))  # 4.94e-7 at 35°C
-    K_a_IN = pow(10,(-9.25))*np.exp((51965/(R*100))*(1/T_base-1/T_op))  # 1.11e-9 at 35°C
-    k_A_Bva = 1e10     #1e8 according to STR 
-    k_A_Bbu = 1e10    #1e8 according to STR  
-    k_A_Bpro = 1e10    #1e8 according to STR 
-    k_A_Bac = 1e10    #1e8 according to STR 
-    k_A_Bco2 = 1e10    #1e8 according to STR 
-    k_A_BIN = 1e10     #1e8 according to STR 
+    K_a_IN = pow(10,(-9.25))*np.exp((51965/(R*100))*(1/T_base-1/T_op))  # 1.11e-9 at 35°C'''
+    k_A_Bva = 1e10     #1e8 according to STR       
+    k_A_Bbu = 1e10    #1e8 according to STR        
+    k_A_Bpro = 1e10    #1e8 according to STR       
+    k_A_Bac = 1e10    #1e8 according to STR        
+    k_A_Bco2 = 1e10    #1e8 according to STR       
+    k_A_BIN = 1e10     #1e8 according to STR       
     kLa = 200
     K_H_co2 = 0.035*np.exp((-19410/(R*100))*(1/T_base-1/T_op)) #0.0271 at 35°C
     K_H_ch4 = 0.0014*np.exp((-14240/(R*100))*(1/T_base-1/T_op)) #0.00116 at 35°C
     K_H_h2 = 7.8e-4*np.exp((-4180/(R*100))*(1/T_base-1/T_op)) #7.38e-4 at 35°C
-    C_xc = 0.02786
-    C_sI = 0.03
-    C_ch = 0.0313
-    C_pr = 0.03
-    C_li = 0.022
-    C_xI = 0.03
-    C_su = 0.0313
-    C_aa = 0.03
-    f_fa_li = 0.95
-    C_fa = 0.0217
-    f_h2_su = 0.19
-    f_bu_su = 0.13
-    f_pro_su = 0.27
-    f_ac_su = 0.41
-    N_bac = 0.08/14
-    C_bu = 0.025
-    C_pro = 0.0268
-    C_ac = 0.0313
-    C_bac = 0.0313
-    Y_su = 0.1
-    f_h2_aa = 0.06
-    f_va_aa = 0.23
-    f_bu_aa = 0.26
-    f_pro_aa = 0.05
-    f_ac_aa = 0.40
-    C_va = 0.024
-    Y_aa = 0.08
-    Y_fa = 0.06
-    Y_c4 = 0.06
-    Y_pro = 0.04
-    C_ch4 = 0.0156
-    Y_ac = 0.05
-    Y_h2 = 0.06
-    f_sI_xc = 0 #0.1
-    f_xI_xc = 0.53 #0.2
-    f_ch_xc = 0.41 #0.2
-    f_pr_xc = 0.06 #0.2
-    f_li_xc = 0    #0.3 
-    N_xc = 0.0376/14
-    N_I = 0.06/14
-    N_aa = 0.007
+
+    #--- Physical parameter :-------------------------------------------------------------
+
     V_liq =3400 #1400 //3400
     V_gas =300  # 100  // 300
-    u=np.array([0,0,0,0,0,0,0,0,0,0.04,0.01,0,248,0,0,0,0,0,0,0,0,0,0,0,0.04,0.02,170,35])
+    
+    #---Input characterisation : ---------------------------------------------------------
 
-    #------filter for negative value:
+    u=np.array([0,0,0,0,0,0,0,0,0,0.04,0.01,0,248,0,0,0,0,0,0,0,0,0,0,0,0.04,0.02,170,35])
+    
+    #------filter for negative value: ---------------------------------------------------
                    
     for i in range(42): 
         if (x[i] < 0):  
             x[i] = 0
-        
-    #---- pression----:
+ 
+    #---- Pression----: ----------------------------------------------------------------
     
     p_gas_h2 = x[32]*R*T_op/16
     p_gas_ch4 = x[33]*R*T_op/64
     p_gas_co2 = x[34]*R*T_op
     P_gas = p_gas_h2 + p_gas_ch4 + p_gas_co2 + p_gas_h2o
-    #---simplified gas flow calculation, Batstone 2002
+    
+    #---simplified gas flow calculation, Batstone 2002 : -------------------------------
 
-    q_gas = k_P*(P_gas-P_atm) #.*P_gas/P_atm;
+    q_gas = k_P*(P_gas-P_atm) #.*P_gas/P_atm
     
 
-     #---pH algebric calculation
+    #---pH algebric calculation : ------------------------------------------------------
+    
     phi = x[24]+(x[10]-x[31])-x[30]-(x[29]/64)-(x[28]/112)-(x[27]/160)-(x[26]/208)-x[25]
     S_H_ion = (-1)*phi*0.5+0.5*np.sqrt(phi*phi+4*K_w)
     if S_H_ion<=0 :
@@ -185,7 +223,7 @@ def ODE_adm1(x,t):
     eps=0.000001
 
 
-    #---Hill function on SH+ => ulf version 2008
+    #---Hill function on SH+ => ulf version 2008 : --------------------------
 
     pHLim_aa = pow(10,(-1*(pH_UL_aa + pH_LL_aa)/2))
     pHLim_ac = pow(10,(-1*(pH_UL_ac + pH_LL_ac)/2))
@@ -198,7 +236,7 @@ def ODE_adm1(x,t):
     I_pH_h2 = pow(pHLim_h2,n_h2)/(pow(S_H_ion,n_h2)+pow(pHLim_h2,n_h2))
     
    
-    #---Inhibition
+    #---Inhibition : --------------------------------------------------------
     
     I_IN_lim = 1/(1+K_S_IN/x[10])
     I_h2_fa = 1/(1+x[7]/K_Ih2_fa)
@@ -214,7 +252,7 @@ def ODE_adm1(x,t):
     inhib[4] = I_pH_ac*I_IN_lim*I_nh3
     inhib[5] = I_pH_h2*I_IN_lim
 
-    #---Biochemical Process rates
+    #---Biochemical Process rates : -----------------------------------------
     
     proc1 = k_dis*x[12]
     proc2 = k_hyd_ch*x[13]
@@ -237,7 +275,7 @@ def ODE_adm1(x,t):
     proc19 = k_dec_Xh2*x[22]
     
 
-    #--- Acid-base rates
+    #--- Acid-base rates : -----------------------------------
     
     procA4 = k_A_Bva*(x[26]*(K_a_va+S_H_ion)-K_a_va*x[3])
     procA5 = k_A_Bbu*(x[27]*(K_a_bu+S_H_ion)-K_a_bu*x[4])
@@ -246,14 +284,14 @@ def ODE_adm1(x,t):
     procA10 = k_A_Bco2*(x[30]*(K_a_co2+S_H_ion)-K_a_co2*x[9])
     procA11 = k_A_BIN*(x[31]*(K_a_IN+S_H_ion)-K_a_IN*x[10])
     
-    #--- Gas transfer rates
+    #--- Gas transfer rates : --------------------------------
              
     procT8 = kLa*(x[7]-16*K_H_h2*p_gas_h2)
     procT9 = kLa*(x[8]-64*K_H_ch4*p_gas_ch4)
     procT10 = kLa*((x[9]-x[30])-K_H_co2*p_gas_co2)
     
 
-    #--- reaction parameters
+    #--- Reaction parameters : --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 
     stoich1 = -C_xc + f_sI_xc*C_sI + f_ch_xc*C_ch + f_pr_xc*C_pr + f_li_xc*C_li + f_xI_xc*C_xI
     stoich2 = -C_ch+C_su
@@ -294,13 +332,12 @@ def ODE_adm1(x,t):
     reac23 = Y_h2*proc12-proc19
     reac24 = f_xI_xc*proc1
 
-    #---Gas flow calculation
-    ####q_gas = R*T_op*V_liq*(procT8/16+procT9/64+procT10)/(P_atm-p_gas_h2o);
+    #---Gas flow : ---------------------------------------------
 
     if q_gas < 0 :
         q_gas = 0.0
 
-    #---differential equation ///////////////////////////////////////////////
+    #---Differential equation : ---------------------------------
     dx=zeros(42)
     dx[0] = ((1/V_liq)*(u[26]*(u[0]-x[0])))+reac1  # Ssu
     dx[1] = 1/V_liq*(u[26]*(u[1]-x[1]))+reac2  # Saa
@@ -342,7 +379,7 @@ def ODE_adm1(x,t):
     dx[34] = -x[34]*q_gas/V_gas+procT10*V_liq/V_gas #Sgas CO2
 
 
-   #---Dummy states*/
+   #---Dummy states : ------------------------------------------
 
     dx[35] = 0
     dx[36] = 0 
@@ -355,37 +392,26 @@ def ODE_adm1(x,t):
     
     return (dx)
 
-    
-R = 0.083145
-T_op = 308.15
-T_base = 298.15
-K_w = (pow(10,(-14)))*np.exp((55900/(R*100))*(1/T_base-1/T_op))  # 2.08e-14
-p_gas_h2o = 0.0313*np.exp(5290*(1/T_base-1/T_op))  #//0.0557 at 35°C
-k_P = 5e4
-P_atm = 1.013
-dx= ODE_adm1(Xinit,t)
+   #--- Function end -------------------------------------------
+
+#--- ODE Resolution: -----------
+
+t= linspace(0,200 ,2001)
 x= odeint (ODE_adm1, Xinit , t)
-pH=zeros(2001)
-Stot=zeros(2001)
-Xbact=zeros(2001)
-p_gas_h2=zeros(2001)
-p_gas_ch4=zeros(2001)
-p_gas_co2=zeros(2001)
-P_gas=zeros(2001)
-q_gas=zeros(2001)
-T_COD=zeros(2001)
-VFA=zeros(2001)
-IN_N=zeros(2001)
-ch4_per=zeros(2001)
+
+#-------------------------------
+
 for i in range (0,2001):
+
+        #----------Computation of PH:--------------------------------------------------------------------------------------------
 
         Phi = x[i][24] + (x[i][10]-x[i][31]) - x[i][30] - x[i][29]/64 - x[i][28]/112 - x[i][27]/160 - x[i][26]/208 - x[i][25]
         x[i][40] = - Phi/2 + sqrt(pow(Phi, 2) + 4*K_w)/2
         pH[i]=-log10(x[i][40])
-        x[i][41]=pH[i] #% calculate pH from S_H+
+        x[i][41]=pH[i] 
           
           
-        #------------ Computations of transfer rates, gas flow rate for the figures : 
+        #----------Computations of transfer rates, gas flow rate for the figures : ----------------------------------------------
 
         Stot[i]=x[i][0]+x[i][1]+x[i][2]+x[i][3]+x[i][4]+x[i][5]+x[i][6]+x[i][7]+x[i][8]+x[i][9]+x[i][10]+x[i][11] #substrats sum
         Xbact[i]=x[i][16]+x[i][17]+x[i][18]+x[i][19]+x[i][20]+x[i][21]+x[i][22]  #Micro-organisms sum
@@ -394,7 +420,7 @@ for i in range (0,2001):
         IN_N[i]=x[i][10]
         
 
-        #----------GAS PHASE :
+        #----------GAS PHASE : --------------------------------------------------------------------------------------------------
         
         p_gas_h2[i]= x[i][32]*R*T_op/16
         x[i][35]=p_gas_h2[i]
@@ -407,17 +433,22 @@ for i in range (0,2001):
         P_gas[i] = p_gas_h2[i] + p_gas_ch4[i] + p_gas_co2[i] + p_gas_h2o 
         x[i][38]=P_gas[i]
 
-        ##---% CH4:
+        #----% CH4 : ------------------------------------------------------------------------------------------------------------
+
         ch4_per[i]=(x[i][36]/x[i][38])*100
 
-        ##---// simplified gas calculation Batstone 2002 :
+        #---- Simplified gas calculation Batstone 2002 : ------------------------------------------------------------------------
 
         q_gas[i] = k_P*(P_gas[i]-P_atm)*P_gas[i]/P_atm
         #q_gas=max(q_gas,zeros(size(q_gas)))  
         x[i][39]= q_gas[i]
 
+        #------------------------------------------------------------------------------------------------------------------------
+
+# Les plots :
+
 plt.plot(t,pH)
-plt.ylabel("PH") # graphe bon
+plt.ylabel("PH") 
 plt.savefig('PH.pdf')  
 
 

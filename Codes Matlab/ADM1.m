@@ -206,7 +206,6 @@ X_D5_D = 106.0099;
 S_H_ion = 5.3469e-008;
 
 Xinit=[S_su; S_aa; S_fa; S_va; S_bu; S_pro; S_ac; S_h2; S_ch4; S_IC; S_IN; S_I; X_xc; X_ch; X_pr; X_li; X_su; X_aa; X_fa; X_c4; X_pro; X_ac; X_h2; X_I; S_cat; S_an; S_hva; S_hbu; S_hpro; S_hac; S_hco3; S_nh3; S_gas_h2; S_gas_ch4; S_gas_co2; Q_D; T_D; S_D1_D; S_D2_D; S_D3_D; X_D4_D; X_D5_D];
-
 %%//////////////////////////////////////////////////////////////////////
 %%// Solver ODE
 %%//////////////////////////////////////////////////////////////////////

@@ -139,7 +139,7 @@ p_gas_co2 = x(35)*R*T_op;
   phi = x(25)+(x(11)-x(32))-x(31)-x(30)/64-x(29)/112-x(28)/160-x(27)/208-x(26);
   S_H_ion = -phi*0.5+0.5*sqrt(phi*phi+4*K_w);
   if S_H_ion<=0 then
-      S_H_ion=10^-12
+      S_H_ion=10^-12;
   end
   pH_op = -log10(S_H_ion); %// pH
 
